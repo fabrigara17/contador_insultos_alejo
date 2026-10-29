@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Insultos de Alejo 🤬</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfits & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        /* Botón gigante 3D */
+        .btn-giant {
+            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 12px 0 #991b1b, 0 15px 25px rgba(239, 68, 68, 0.4);
+            transition: all 0.08s ease;
+        }
+
+        .btn-giant:active {
+            transform: translateY(8px);
+            box-shadow: 0 4px 0 #991b1b, 0 8px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Animación de pulso para números */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25) rotate(-3deg); }
+            100% { transform: scale(1); }
+        }
+
+        .pop-animation {
+            animation: pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Emojis flotantes */
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(1.5) rotate(20deg);
+            }
+        }
+
+        .floating-emoji {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            font-size: 2rem;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white flex flex-col items-center justify-between p-4 sm:p-6 overflow-hidden select-none">
+
+    <!-- Encabezado -->
+    <header class="text-center mt-4 sm:mt-6 z-10">
+        <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase mb-3 backdrop-blur-md">
+            <i class="fa-solid font-black fa-bolt"></i> Registro Oficial en Tiempo Real
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-300 to-amber-200">
+            Insultos de Alejo 🤬
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-xs sm:max-w-md mx-auto">
+            Cada vez que Alejo diga una barbaridad, presiona el botón gigante sin piedad.
+        </p>
+    </header>
+
+    <!-- Tarjeta Principal del Contador -->
+    <main class="w-full max-w-md my-auto flex flex-col items-center justify-center z-10 relative">
+        
+        <!-- Contenedor del Número -->
+        <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 w-full text-center shadow-2xl relative mb-8">
+            <div class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-1">
+                Total Acumulado
+            </div>
+            
+            <!-- Contador Principal -->
+            <div id="counter" class="text-7xl sm:text-9xl font-black text-white tracking-tighter my-2 drop-shadow-[0_0_35px_rgba(239,68,68,0.3)]">
+                0
+            </div>
+
+            <!-- Frase dinámica basada en la cuenta -->
+            <div id="status-phrase" class="text-xs sm:text-sm font-medium text-amber-400 min-h-[20px] transition-all">
+                Ángel de luz (por ahora...)
+            </div>
+        </div>
+
+        <!-- Botón Gigante 3D -->
+        <div class="relative w-full flex justify-center items-center">
+            <button id="increment-btn" class="btn-giant w-full max-w-xs py-6 sm:py-8 rounded-3xl text-2xl sm:text-3xl font-extrabold text-white flex flex-col items-center justify-center gap-1 cursor-pointer select-none border-2 border-red-400/30">
+                <span class="flex items-center gap-3 tracking-wide">
+                    <i class="fa-solid fa-plus text-xl"></i> 1 INSULTO
+                </span>
+                <span class="text-xs text-red-200 font-normal opacity-90 uppercase tracking-widest">¡Presiona aquí!</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Barra de Herramientas Inferior -->
+    <footer class="w-full max-w-md flex items-center justify-between gap-3 text-slate-400 text-xs z-10 bg-slate-900/40 p-3 rounded-2xl border border-slate-800/80 backdrop-blur-md">
+        
+        <!-- Botón Deshacer -->
+        <button id="undo-btn" class="hover:text-white transition-colors flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-800/60">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Deshacer</span>
+        </button>
+
+        <!-- Última actualización -->
+        <span id="last-updated" class="text-slate-500 hidden sm:inline">
+            Sin registro hoy
+        </span>
+
+        <!-- Botón Reiniciar -->
+        <button id="reset-btn" class="hover:text-red-400 transition-colors flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-800/60">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>Reiniciar</span>
+        </button>
+
+    </footer>
+
+    <!-- Script de Funcionalidad -->
+    <script>
+        // Elementos del DOM
+        const counterEl = document.getElementById('counter');
+        const incrementBtn = document.getElementById('increment-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const phraseEl = document.getElementById('status-phrase');
+        const lastUpdatedEl = document.getElementById('last-updated');
+
+        // Estado inicial desde LocalStorage
+        let count = parseInt(localStorage.getItem('alejo_insults_count')) || 0;
+        let history = []; // Historial simple para deshacer
+
+        // Lista de frases graciosas según la cantidad
+        const phrases = [
+            { limit: 0, text: "😇 Alejo está extrañamente tranquilo..." },
+            { limit: 5, text: "🤫 Ya empezó a soltar veneno leve." },
+            { limit: 15, text: "🔥 Alejo está tomando vuelo." },
+            { limit: 30, text: "🤬 Modo marinero furioso activado." },
+            { limit: 50, text: "💀 Peligro de explosión verbal." },
+            { limit: 100, text: "🌋 Nivel histórico: Alejo rompió el récord." }
+        ];
+
+        // Emojis para la animación al hacer clic
+        const emojis = ['🤬', '💥', '🔥', '🤐', '🖕', '💣', '⚡️'];
+
+        // Guardar y Actualizar Interfaz
+        function updateUI(animate = false) {
+            counterEl.textContent = count;
+            localStorage.setItem('alejo_insults_count', count);
+
+            // Efecto visual en el número
+            if (animate) {
+                counterEl.classList.remove('pop-animation');
+                void counterEl.offsetWidth; // Force reflow
+                counterEl.classList.add('pop-animation');
+            }
+
+            // Actualizar frase según el conteo
+            const currentPhrase = [...phrases].reverse().find(p => count >= p.limit);
+            if (currentPhrase) {
+                phraseEl.textContent = currentPhrase.text;
+            }
+
+            // Actualizar hora del último insulto
+            if (count > 0) {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                lastUpdatedEl.textContent = `Último: ${timeStr}`;
+            } else {
+                lastUpdatedEl.textContent = "Sin registro hoy";
+            }
+        }
+
+        // Crear animación de emoji flotante al presionar el botón
+        function createFloatingEmoji(e) {
+            const emojiEl = document.createElement('div');
+            emojiEl.classList.add('floating-emoji');
+            
+            // Emoji aleatorio
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            emojiEl.textContent = randomEmoji;
+
+            // Posición basada en el clic o centro del botón
+            const rect = incrementBtn.getBoundingClientRect();
+            const x = (e.clientX || (rect.left + rect.width / 2)) - 15 + (Math.random() * 40 - 20);
+            const y = (e.clientY || (rect.top + rect.height / 2)) - 20;
+
+            emojiEl.style.left = `${x}px`;
+            emojiEl.style.top = `${y}px`;
+
+            document.body.appendChild(emojiEl);
+
+            // Remover después de terminar la animación
+            setTimeout(() => {
+                emojiEl.remove();
+            }, 800);
+        }
+
+        // Evento Incrementar (+1)
+        incrementBtn.addEventListener('click', (e) => {
+            history.push(count);
+            count++;
+            updateUI(true);
+            createFloatingEmoji(e);
+
+            // Taptic feedback para celulares (vibración)
+            if (navigator.vibrate) {
+                navigator.vibrate(40);
+            }
+        });
+
+        // Evento Deshacer (-1)
+        undoBtn.addEventListener('click', () => {
+            if (count > 0) {
+                count--;
+                updateUI(true);
+            }
+        });
+
+        // Evento Reiniciar (Reset)
+        resetBtn.addEventListener('click', () => {
+            if (count === 0) return;
+            
+            // Confirmación estilizada mediante un pequeño cuadro personalizado o nativo seguro
+            const confirmReset = window.confirm("¿Seguro que quieres reiniciar la cuenta de insultos a cero?");
+            if (confirmReset) {
+                count = 0;
+                history = [];
+                updateUI(true);
+            }
+        });
+
+        // Carga inicial
+        updateUI();
+    </script>
+</body>
+</html>
